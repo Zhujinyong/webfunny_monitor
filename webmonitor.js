@@ -58,13 +58,14 @@
     , WEB_LOCAL_IP = 'localhost'
 
     // 监控平台地址
-    , WEB_MONITOR_IP = 'www.webfunny.cn'
+   // , WEB_MONITOR_IP = 'www.webfunny.cn'
+    , WEB_MONITOR_IP = '127.0.0.1:8010'
 
     // 上传数据的uri, 区分了本地和生产环境
     , HTTP_UPLOAD_URI =  WEB_LOCATION.indexOf(WEB_LOCAL_IP) == -1 ? WEB_HTTP_TYPE + WEB_MONITOR_IP : WEB_HTTP_TYPE + WEB_LOCAL_IP + ':8010'
 
     // 上传数据的接口API
-    , HTTP_UPLOAD_LOG_API = '/api/v1/upLgb'
+    , HTTP_UPLOAD_LOG_API = '/api/v1/upLog'
 
     // 上传数据时忽略的uri, 需要过滤掉监控平台上传接口
     , WEB_MONITOR_IGNORE_URL = HTTP_UPLOAD_URI + HTTP_UPLOAD_LOG_API
@@ -170,19 +171,19 @@
     this.happenTime = new Date().getTime(); // 日志发生时间
     this.webMonitorId = WEB_MONITOR_ID;     // 用于区分应用的唯一标识（一个项目对应一个）
     this.simpleUrl =  window.location.href.split('?')[0].replace('#', ''); // 页面的url
-    this.completeUrl =  utils.b64EncodeUnicode(encodeURIComponent(window.location.href)); // 页面的完整url
+    this.completeUrl =  (encodeURIComponent(window.location.href)); // 页面的完整url
     this.customerKey = utils.getCustomerKey(); // 用于区分用户，所对应唯一的标识，清理本地数据后失效，
     // 用户自定义信息， 由开发者主动传入， 便于对线上问题进行准确定位
     var wmUserInfo = localStorage.wmUserInfo ? JSON.parse(localStorage.wmUserInfo) : "";
-    this.userId = utils.b64EncodeUnicode(wmUserInfo.userId || "");
-    this.firstUserParam = utils.b64EncodeUnicode(wmUserInfo.firstUserParam || "");
-    this.secondUserParam = utils.b64EncodeUnicode(wmUserInfo.secondUserParam || "");
+    this.userId = (wmUserInfo.userId || "");
+    this.firstUserParam = (wmUserInfo.firstUserParam || "");
+    this.secondUserParam = (wmUserInfo.secondUserParam || "");
   }
   // 用户访问行为日志(PV)
   function CustomerPV(uploadType, loadType, loadTime) {
     setCommonProperty.apply(this);
     this.uploadType = uploadType;
-    this.projectVersion = utils.b64EncodeUnicode(localStorage.CUSTOMER_WEB_MONITOR_VERSION || ""); // 版本号， 用来区分监控应用的版本，更有利于排查问题
+    this.projectVersion = (localStorage.CUSTOMER_WEB_MONITOR_VERSION || ""); // 版本号， 用来区分监控应用的版本，更有利于排查问题
     this.pageKey = utils.getPageKey();  // 用于区分页面，所对应唯一的标识，每个新页面对应一个值
     this.deviceName = DEVICE_INFO.deviceName;
     this.os = DEVICE_INFO.os + (DEVICE_INFO.osVersion ? " " + DEVICE_INFO.osVersion : "");
@@ -219,11 +220,11 @@
     setCommonProperty.apply(this);
     this.uploadType = uploadType;
     this.behaviorType = behaviorType;
-    this.className = utils.b64EncodeUnicode(className);
-    this.placeholder = utils.b64EncodeUnicode(placeholder);
-    this.inputValue = utils.b64EncodeUnicode(inputValue);
+    this.className = (className);
+    this.placeholder = (placeholder);
+    this.inputValue = (inputValue);
     this.tagName = tagName;
-    this.innerText = utils.b64EncodeUnicode(encodeURIComponent(innerText));
+    this.innerText = (encodeURIComponent(innerText));
   }
   BehaviorInfo.prototype = new MonitorBaseInfo();
 
@@ -242,8 +243,8 @@
     this.country = "china";  // 用户所在国家
     this.province = "";  // 用户所在省份
     this.city = "";  // 用户所在城市
-    this.errorMessage = utils.b64EncodeUnicode(errorMsg)
-    this.errorStack = utils.b64EncodeUnicode(errorStack);
+    this.errorMessage = (errorMsg)
+    this.errorStack = (errorStack);
     this.browserInfo = "";
   }
   JavaScriptErrorInfo.prototype = new MonitorBaseInfo();
@@ -253,12 +254,12 @@
     setCommonProperty.apply(this);
     this.uploadType = uploadType;  // 上传类型
     this.simpleUrl = simpleUrl;
-    this.httpUrl = utils.b64EncodeUnicode(encodeURIComponent(url)); // 请求地址
+    this.httpUrl = (encodeURIComponent(url)); // 请求地址
     this.status = status; // 接口状态
     this.statusText = statusText; // 状态描述
     this.statusResult = statusResult; // 区分发起和返回状态
     this.requestText = ""; // 请求参数的JSON字符串
-    this.responseText = utils.b64EncodeUnicode(responseText); // 返回的结果JSON字符串
+    this.responseText = (responseText); // 返回的结果JSON字符串
     this.happenTime = currentTime;  // 客户端发送时间
     this.loadTime = loadTime; // 接口请求耗时
   }
@@ -268,7 +269,7 @@
   function ScreenShotInfo(uploadType, des, screenInfo, imgType) {
     setCommonProperty.apply(this);
     this.uploadType = uploadType;
-    this.description = utils.b64EncodeUnicode(des);
+    this.description = (des);
     this.screenInfo = screenInfo;
     this.imgType = imgType || "jpeg";
   }
@@ -279,7 +280,7 @@
     setCommonProperty.apply(this);
     this.uploadType = uploadType;
     this.elementType = elementType;
-    this.sourceUrl = utils.b64EncodeUnicode(encodeURIComponent(url));
+    this.sourceUrl = (encodeURIComponent(url));
     this.status = status;  // 资源加载状态： 0/失败、1/成功
   }
   ResourceLoadInfo.prototype = new MonitorBaseInfo();
@@ -813,7 +814,7 @@
       window.html2canvas && window.html2canvas(cntElem, opts).then(function(canvas) {
         var dataURL = canvas.toDataURL("image/webp");
         var tempCompress = dataURL.replace("data:image/webp;base64,", "");
-        var compressedDataURL = utils.b64EncodeUnicode(tempCompress);
+        var compressedDataURL = (tempCompress);
         var screenShotInfo = new ScreenShotInfo(SCREEN_SHOT, description, compressedDataURL)
         screenShotInfo.handleLogInfo(SCREEN_SHOT, screenShotInfo);
       });
